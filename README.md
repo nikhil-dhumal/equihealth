@@ -43,6 +43,28 @@ Healthcare access is often unequal, with some districts having fewer facilities 
 
 ---
 
+## 💻 Installation & Running  
+
+### Backend (Flask)
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate    # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+flask run
+```
+
+### Fronend (React)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+>Note
+- Backend runs on http://127.0.0.1:5000
+- Frontend runs on http://localhost:5173
+
 ## 📅 Roadmap  
 
 - [x] Maharashtra dataset fully integrated  
