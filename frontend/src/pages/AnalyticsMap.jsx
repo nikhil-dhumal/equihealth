@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import Map from "../components/common/Map.jsx";
@@ -6,8 +6,8 @@ import SelectFilters from "../components/common/SelectFilters.jsx";
 
 import { setActivePage } from "../redux/features/activePageSlice.js";
 
-const AnalyticsDashboard = () => {
-  const dispatch = useDispatch()
+const AnalyticsMap = () => {
+  const dispatch = useDispatch();
 
   const [selected, setSelected] = useState({
     district: null,
@@ -15,15 +15,15 @@ const AnalyticsDashboard = () => {
   });
 
   useEffect(() => {
-    dispatch(setActivePage(1))
-  }, [dispatch])
+    dispatch(setActivePage(1));
+  }, [dispatch]);
 
   return (
-    <div id="analytics-dashboard">
+    <div id="analytics-map">
       <SelectFilters selected={selected} setSelected={setSelected} />
       <Map selected={selected} />
     </div>
   );
 };
 
-export default AnalyticsDashboard;
+export default AnalyticsMap;
