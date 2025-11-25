@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   MapContainer,
@@ -10,7 +10,6 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-const DEFAULT_CENTER = [19.7515, 75.7139];
 const DEFAULT_ZOOM = 6;
 
 const ZoomHandler = ({ setZoom }) => {
@@ -69,7 +68,7 @@ const aggregateBeds = (hospitals, key, districts) => {
   return Object.values(map);
 };
 
-const MapZoomController = ({ selected }) => {
+const MapZoomController = ({ selected, state }) => {
   const map = useMap();
   const { districts, hospitals } = useSelector((state) => state.healthInfra);
 
@@ -87,8 +86,8 @@ const MapZoomController = ({ selected }) => {
       lng = d?.longitude;
       zoom = 9;
     } else {
-      lat = DEFAULT_CENTER[0];
-      lng = DEFAULT_CENTER[1];
+      lat = state.latitude;
+      lng = state.longitude;
       zoom = DEFAULT_ZOOM;
     }
 
@@ -99,11 +98,10 @@ const MapZoomController = ({ selected }) => {
 };
 
 const Map = ({ selected }) => {
-  const { districts, hospitals, loaded } = useSelector((state) => state.healthInfra);
+  const { state, districts, hospitals, loaded } = useSelector(
+    (state) => state.healthInfra
+  );
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-
-  if (!loaded) return <p>Loading map...</p>;
-  if (!hospitals.allIds.length) return <p>No hospital data available</p>;
 
   const hospitalList = hospitals.allIds.map((id) => hospitals.byId[id]);
 
@@ -149,13 +147,20 @@ const Map = ({ selected }) => {
     );
   };
 
+  if (!loaded) return <p>Loading map...</p>;
+  if (!hospitals.allIds.length) return <p>No hospital data available</p>;
+
   return (
-    <MapContainer className="map" center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM}>
+    <MapContainer
+      className="map"
+      center={[state.latitude, state.longitude]}
+      zoom={DEFAULT_ZOOM}
+    >
       <TileLayer
         attribution='&copy; <a href="https://osm.org">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <MapZoomController selected={selected} />
+      <MapZoomController selected={selected} state={state} />
       <ZoomHandler setZoom={setZoom} />
 
       {displayData.map((item, i) => (
