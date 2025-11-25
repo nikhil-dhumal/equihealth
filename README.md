@@ -19,7 +19,7 @@ Healthcare access is often unequal, with some districts having fewer facilities 
 
 - **Visualization Dashboards** – Interactive charts and maps comparing hospital resources vs. population  
 - **Complaint Portal** – Citizens can log issues such as staff shortages, lack of equipment, or hospital service problems  
-- **Government Dashboard** – Authorities can track and resolve reported issues  
+- **Government Dashboard** – Authorities can track reported issues  
 
 ---
 
