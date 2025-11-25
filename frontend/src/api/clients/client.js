@@ -2,17 +2,6 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
-// 🔒 If page is https and baseURL is http -> upgrade to https
-if (typeof window !== "undefined") {
-  const isHttpsPage = window.location.protocol === "https:";
-  if (isHttpsPage && baseURL.startsWith("http://")) {
-    baseURL = baseURL.replace(/^http:\/\//, "https://");
-  }
-}
-
-// TEMP: log to verify what is actually used in the deployed app
-console.log("AXIOS BASE URL: ", baseURL);
-
 const client = axios.create({
   baseURL,
   paramsSerializable: {
@@ -27,13 +16,11 @@ const client = axios.create({
 });
 
 client.interceptors.request.use(async (config) => {
-  const method = (config.method || "get").toLowerCase();
-  config.headers = config.headers || {};
-  if (["post", "put", "patch", "delete"].includes(method)) {
-    config.headers["Content-Type"] = "application/json";
-  }
   return {
     ...config,
+    headers: {
+      "Content-Type": "application/json",
+    },
   };
 });
 
