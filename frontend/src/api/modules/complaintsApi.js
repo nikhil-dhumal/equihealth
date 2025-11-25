@@ -1,7 +1,7 @@
 import client from "../clients/client.js";
 
 const endpoints = {
-  postComplaint: "complaints",
+  postComplaint: "complaints/",
   getComplaints: "complaints",
   getComplaintById: (complaintId) => `complaints/${complaintId}`,
 };
@@ -17,26 +17,17 @@ const complaintsApi = {
     hospitalId,
     title,
     details,
-    attachment,
   }) => {
     try {
-      const formData = new FormData();
-      formData.append(
-        "name",
-        lastName ? `${firstName} ${lastName}` : firstName
-      );
-      formData.append("phone_number", phoneNumber);
-      formData.append("email", email);
-      formData.append("state_id", stateId);
-      formData.append("district_id", districtId);
-      formData.append("hospital_id", hospitalId);
-      formData.append("title", title);
-      formData.append("details", details);
-      if (attachment) formData.append("attachment", attachment);
-      const res = await client.post(endpoints.postComplaint, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await client.post(endpoints.postComplaint, {
+        name: lastName ? `${firstName} ${lastName}` : firstName,
+        phone_number: phoneNumber,
+        email,
+        state_id: Number(stateId),
+        district_id: Number(districtId),
+        hospital_id: Number(hospitalId),
+        title,
+        details,
       });
       return { res };
     } catch (err) {

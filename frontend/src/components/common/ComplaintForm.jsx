@@ -1,10 +1,11 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 import Select from "react-select";
 import * as Yup from "yup";
 
 import complaintsApi from "../../api/modules/complaintsApi";
+import userApi from "../../api/modules/userApi";
 
 const selectStyles = {
   control: (base, state) => ({
@@ -43,14 +44,17 @@ const selectStyles = {
 const ComplaintForm = () => {
   const { districts, hospitals } = useSelector((state) => state.healthInfra);
 
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
   const complaintForm = useFormik({
     initialValues: {
       firstName: "",
       lastName: "",
       phoneNumber: "",
       email: "",
-      districtId: "",
-      hospitalId: "",
+      districtId: null,
+      hospitalId: null,
       title: "",
       details: "",
     },
@@ -69,8 +73,12 @@ const ComplaintForm = () => {
       email: Yup.string()
         .email("Enter a valid email address")
         .required("Email is required"),
-      districtId: Yup.string().required("Please select a district"),
-      hospitalId: Yup.string().required("Please select a hospital"),
+      districtId: Yup.number()
+        .typeError("Please select a district")
+        .required("Please select a district"),
+      hospitalId: Yup.number()
+        .typeError("Please select a hospital")
+        .required("Please select a hospital"),
       title: Yup.string()
         .trim()
         .min(5, "Title must be at least 5 characters")
@@ -82,31 +90,26 @@ const ComplaintForm = () => {
         .max(1000, "Details must be at most 1000 characters")
         .required("Please provide more details about your complaint"),
     }),
-    onSubmit: async ({
-      firstName,
-      lastName,
-      phoneNumber,
-      email,
-      stateId,
-      districtId,
-      hospitalId,
-      title,
-      details,
-    }) => {
+    onSubmit: async (values, { resetForm }) => {
+      setSubmitting(true);
+      setSuccessMsg("");
+
       const { res, err } = await complaintsApi.postComplaint({
-        firstName,
-        lastName,
-        phoneNumber,
-        email,
+        ...values,
         stateId: 18,
-        districtId,
-        hospitalId,
-        title,
-        details,
-        attachment: null,
       });
-      if (res) console.log("success");
-      if (err) console.log("failure");
+
+      if (res) {
+        setSuccessMsg("Complaint submitted successfully!");
+        resetForm();
+      }
+      if (err) {
+        setSuccessMsg("Failed to submit complaint. Try again.");
+      }
+
+      setSubmitting(false);
+
+      setTimeout(() => setSuccessMsg(""), 3000);
     },
   });
 
@@ -128,183 +131,214 @@ const ComplaintForm = () => {
       })
     : [];
 
+  useEffect(() => {
+    const phone = complaintForm.values.phoneNumber;
+
+    if (!complaintForm.errors.phoneNumber && phone) {
+      const fetchName = async () => {
+        const { res, err } = await userApi.getName({ phoneNumber: phone });
+        if (res && res.data && res.data.name) {
+          const fullName = res.data.name.trim().split(" ");
+          complaintForm.setFieldValue("firstName", fullName[0] || "");
+          complaintForm.setFieldValue(
+            "lastName",
+            fullName.slice(1).join(" ") || ""
+          );
+        } else {
+          complaintForm.setFieldValue("firstName", "");
+          complaintForm.setFieldValue("lastName", "");
+        }
+      };
+      fetchName();
+    }
+  }, [complaintForm.values.phoneNumber, complaintForm.errors.phoneNumber]);
+
   return (
-    <form
-      className="complaint-form paper"
-      onSubmit={complaintForm.handleSubmit}
-    >
-      <div className="row">
-        <div className="input-field">
-          <input
-            type="text"
-            name="firstName"
-            required
-            placeholder="First name"
-            value={complaintForm.values.firstName}
-            onChange={complaintForm.handleChange}
-            onBlur={complaintForm.handleBlur}
-          />
-          <p className="helper-text">
-            {complaintForm.touched.firstName && complaintForm.errors.firstName
-              ? complaintForm.errors.firstName
-              : ""}
-          </p>
+    <>
+      <p className="success-message">{successMsg}</p>
+      <form
+        className="complaint-form paper"
+        onSubmit={complaintForm.handleSubmit}
+      >
+        <div className="row">
+          <div className="input-field">
+            <input
+              type="text"
+              name="firstName"
+              required
+              placeholder="First name"
+              value={complaintForm.values.firstName}
+              onChange={complaintForm.handleChange}
+              onBlur={complaintForm.handleBlur}
+            />
+            <p className="helper-text">
+              {complaintForm.touched.firstName && complaintForm.errors.firstName
+                ? complaintForm.errors.firstName
+                : ""}
+            </p>
+          </div>
+          <div className="input-field">
+            <input
+              type="text"
+              name="lastName"
+              required
+              placeholder="Last name"
+              value={complaintForm.values.lastName}
+              onChange={complaintForm.handleChange}
+              onBlur={complaintForm.handleBlur}
+            />
+            <p className="helper-text">
+              {complaintForm.touched.lastName && complaintForm.errors.lastName
+                ? complaintForm.errors.lastName
+                : ""}
+            </p>
+          </div>
         </div>
-        <div className="input-field">
-          <input
-            type="text"
-            name="lastName"
-            required
-            placeholder="Last name"
-            value={complaintForm.values.lastName}
-            onChange={complaintForm.handleChange}
-            onBlur={complaintForm.handleBlur}
-          />
-          <p className="helper-text">
-            {complaintForm.touched.lastName && complaintForm.errors.lastName
-              ? complaintForm.errors.lastName
-              : ""}
-          </p>
+        <div className="row">
+          <div className="input-field">
+            <input
+              type="text"
+              name="phoneNumber"
+              required
+              placeholder="Phone number"
+              value={complaintForm.values.phoneNumber}
+              onChange={complaintForm.handleChange}
+              onBlur={complaintForm.handleBlur}
+            />
+            <p className="helper-text">
+              {complaintForm.touched.phoneNumber &&
+              complaintForm.errors.phoneNumber
+                ? complaintForm.errors.phoneNumber
+                : ""}
+            </p>
+          </div>
+          <div className="input-field">
+            <input
+              type="text"
+              name="email"
+              required
+              placeholder="Email"
+              value={complaintForm.values.email}
+              onChange={complaintForm.handleChange}
+              onBlur={complaintForm.handleBlur}
+            />
+            <p className="helper-text">
+              {complaintForm.touched.email && complaintForm.errors.email
+                ? complaintForm.errors.email
+                : ""}
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="row">
-        <div className="input-field">
-          <input
-            type="text"
-            name="phoneNumber"
-            required
-            placeholder="Phone number"
-            value={complaintForm.values.phoneNumber}
-            onChange={complaintForm.handleChange}
-            onBlur={complaintForm.handleBlur}
-          />
-          <p className="helper-text">
-            {complaintForm.touched.phoneNumber &&
-            complaintForm.errors.phoneNumber
-              ? complaintForm.errors.phoneNumber
-              : ""}
-          </p>
+        <div className="row">
+          <div className="input-field">
+            <Select
+              className="options"
+              styles={selectStyles}
+              value={
+                districtOptions.find(
+                  (o) => o.value === complaintForm.values.districtId
+                ) || null
+              }
+              options={districtOptions}
+              onChange={(option) => {
+                const value = option ? Number(option.value) : null;
+                complaintForm.setFieldValue("districtId", value);
+                complaintForm.setFieldValue("hospitalId", null);
+              }}
+              onBlur={() => complaintForm.setFieldTouched("districtId", true)}
+              placeholder="Select District"
+              isClearable
+            />
+            <p className="helper-text">
+              {complaintForm.touched.districtId &&
+              complaintForm.errors.districtId
+                ? complaintForm.errors.districtId
+                : ""}
+            </p>
+          </div>
+          <div className="input-field">
+            <Select
+              className="options"
+              styles={selectStyles}
+              value={
+                hospitalOptions.find(
+                  (o) => o.value === complaintForm.values.hospitalId
+                ) || null
+              }
+              options={hospitalOptions}
+              onChange={(option) => {
+                const value = option ? Number(option.value) : null;
+                complaintForm.setFieldValue("hospitalId", value);
+              }}
+              onBlur={() => complaintForm.setFieldTouched("hospitalId", true)}
+              placeholder="Select Hospital"
+              isDisabled={!complaintForm.values.districtId}
+              isClearable
+            />
+            <p className="helper-text">
+              {complaintForm.touched.hospitalId &&
+              complaintForm.errors.hospitalId
+                ? complaintForm.errors.hospitalId
+                : ""}
+            </p>
+          </div>
         </div>
-        <div className="input-field">
-          <input
-            type="text"
-            name="email"
-            required
-            placeholder="Email"
-            value={complaintForm.values.email}
-            onChange={complaintForm.handleChange}
-            onBlur={complaintForm.handleBlur}
-          />
-          <p className="helper-text">
-            {complaintForm.touched.email && complaintForm.errors.email
-              ? complaintForm.errors.email
-              : ""}
-          </p>
+        <div className="row">
+          <div className="input-field">
+            <input
+              type="text"
+              name="title"
+              required
+              placeholder="Title"
+              value={complaintForm.values.title}
+              onChange={complaintForm.handleChange}
+              onBlur={complaintForm.handleBlur}
+            />
+            <p className="helper-text">
+              {complaintForm.touched.title && complaintForm.errors.title
+                ? complaintForm.errors.title
+                : ""}
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="row">
-        <div className="input-field">
-          <Select
-            className="options"
-            styles={selectStyles}
-            value={
-              districtOptions.find(
-                (o) => o.value === complaintForm.values.districtId
-              ) || null
+        <div className="row">
+          <div className="input-field">
+            <textarea
+              rows={3}
+              name="details"
+              required
+              placeholder="Details"
+              value={complaintForm.values.details}
+              onChange={complaintForm.handleChange}
+              onBlur={complaintForm.handleBlur}
+            />
+            <p className="helper-text">
+              {complaintForm.touched.details && complaintForm.errors.details
+                ? complaintForm.errors.details
+                : ""}
+            </p>
+          </div>
+        </div>
+        <div className="row">
+          <button
+            type="button"
+            className="paper-1"
+            onClick={() => complaintForm.resetForm()}
+          >
+            Clear
+          </button>
+          <button
+            className="paper-1"
+            type="submit"
+            disabled={
+              submitting || !complaintForm.isValid || !complaintForm.dirty
             }
-            options={districtOptions}
-            onChange={(option) => {
-              complaintForm.setFieldValue("districtId", option?.value || "");
-              complaintForm.setFieldValue("hospitalId", "");
-            }}
-            onBlur={() => complaintForm.setFieldTouched("districtId", true)}
-            placeholder="Select District"
-            isClearable
-          />
-          <p className="helper-text">
-            {complaintForm.touched.districtId && complaintForm.errors.districtId
-              ? complaintForm.errors.districtId
-              : ""}
-          </p>
+          >
+            {submitting ? "Submitting..." : "Submit"}
+          </button>
         </div>
-        <div className="input-field">
-          <Select
-            className="options"
-            styles={selectStyles}
-            value={
-              hospitalOptions.find(
-                (o) => o.value === complaintForm.values.hospitalId
-              ) || null
-            }
-            options={hospitalOptions}
-            onChange={(option) =>
-              complaintForm.setFieldValue("hospitalId", option?.value || "")
-            }
-            onBlur={() => complaintForm.setFieldTouched("hospitalId", true)}
-            placeholder="Select Hospital"
-            isDisabled={!complaintForm.values.districtId}
-            isClearable
-          />
-          <p className="helper-text">
-            {complaintForm.touched.hospitalId && complaintForm.errors.hospitalId
-              ? complaintForm.errors.hospitalId
-              : ""}
-          </p>
-        </div>
-      </div>
-      <div className="row">
-        <div className="input-field">
-          <input
-            type="text"
-            name="title"
-            required
-            placeholder="Title"
-            value={complaintForm.values.title}
-            onChange={complaintForm.handleChange}
-            onBlur={complaintForm.handleBlur}
-          />
-          <p className="helper-text">
-            {complaintForm.touched.title && complaintForm.errors.title
-              ? complaintForm.errors.title
-              : ""}
-          </p>
-        </div>
-      </div>
-      <div className="row">
-        <div className="input-field">
-          <textarea
-            rows={3}
-            name="details"
-            required
-            placeholder="Details"
-            value={complaintForm.values.details}
-            onChange={complaintForm.handleChange}
-            onBlur={complaintForm.handleBlur}
-          />
-          <p className="helper-text">
-            {complaintForm.touched.details && complaintForm.errors.details
-              ? complaintForm.errors.details
-              : ""}
-          </p>
-        </div>
-      </div>
-      <div className="row">
-        <button
-          type="button"
-          className="paper-1"
-          onClick={() => complaintForm.resetForm()}
-        >
-          Clear
-        </button>
-        <button
-          className="paper-1"
-          type="submit"
-          disabled={!complaintForm.isValid || !complaintForm.dirty}
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };
 

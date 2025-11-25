@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import complaintsApi from "../api/modules/complaintsApi";
@@ -8,7 +8,7 @@ import SelectFilters from "../components/common/SelectFilters";
 
 import { setActivePage } from "../redux/features/activePageSlice";
 
-const ComplaintHistory = () => {
+const Complaints = () => {
   const dispatch = useDispatch();
 
   const [filters, setFilters] = useState({
@@ -18,9 +18,10 @@ const ComplaintHistory = () => {
   });
   const [complaints, setComplaints] = useState([]);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
+  const [pageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [orderDir, setOrderDir] = useState("desc");
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -31,11 +32,13 @@ const ComplaintHistory = () => {
       page,
       pageSize,
       orderBy: "created_at",
-      orderDir: "desc",
+      orderDir,
     });
     if (res && res.data) {
-      setComplaints(res.data.data || []);
-      setTotalPages(res.data.pagination?.total_pages || 1);
+      setComplaints(res.data || []);
+    }
+    if (res && res.pagination) {
+      setTotalPages(res.pagination.total_pages || 1);
     }
     if (err) {
       console.error(err);
@@ -47,10 +50,10 @@ const ComplaintHistory = () => {
 
   useEffect(() => {
     fetchComplaints();
-  }, [filters, page]);
+  }, [filters, page, orderDir]);
 
   useEffect(() => {
-    dispatch(setActivePage(2));
+    dispatch(setActivePage(3));
   }, [dispatch]);
 
   return (
@@ -72,12 +75,28 @@ const ComplaintHistory = () => {
       ) : complaints.length === 0 ? (
         <p>No complaints found.</p>
       ) : (
-        <div className="complaints-grid">
+        <div className="complaints-grid paper">
           <div className="complaints-header grid">
             <div>Title</div>
             <div>District</div>
             <div>Hospital</div>
-            <div>Created At</div>
+            <div className="created-at-header">
+              Created At
+              <div>
+                <span
+                  className={`arrow ${orderDir === "desc" ? "active" : ""}`}
+                  onClick={() => setOrderDir("desc")}
+                >
+                  ▼
+                </span>
+                <span
+                  className={`arrow ${orderDir === "asc" ? "active" : ""}`}
+                  onClick={() => setOrderDir("asc")}
+                >
+                  ▲
+                </span>
+              </div>
+            </div>
           </div>
           {complaints.map((c) => (
             <ComplaintRow key={c.complaint_id} complaint={c} />
@@ -108,4 +127,4 @@ const ComplaintHistory = () => {
   );
 };
 
-export default ComplaintHistory;
+export default Complaints;
