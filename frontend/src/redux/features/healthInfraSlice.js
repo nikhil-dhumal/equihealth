@@ -5,6 +5,7 @@ import { capitalizeWords } from "../../utils/formatters";
 export const healthInfraSlice = createSlice({
   name: "healthInfra",
   initialState: {
+    state: {},
     districts: { byId: {}, allIds: [] },
     hospitals: { byId: {}, allIds: [] },
     loaded: false,
@@ -16,7 +17,9 @@ export const healthInfraSlice = createSlice({
       state.districts = { byId: {}, allIds: [] };
       state.hospitals = { byId: {}, allIds: [] };
 
-      const { stateId } = data[0];
+      const { stateId, state_name, latitude, longitude } = data[0];
+
+      state.state = { stateId, state_name, latitude, longitude };
 
       data[0].districts.forEach((district) => {
         const districtId = district.district_id;
