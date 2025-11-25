@@ -1,75 +1,70 @@
 # EquiHealth  
 
-**EquiHealth** is a web-based platform (currently under development) that will highlight healthcare inequalities across districts and provide a structured system where citizens can report hospital issues and government officials can address them.  
+**EquiHealth** is a web platform that highlights healthcare inequalities across districts of Maharashtra and provides a structured system for citizens to report hospital issues and for government officials to address them.  
 
 ---
 
 ## 🌍 Project Vision  
 
-Access to healthcare is often unequal, with some districts having fewer facilities compared to their population size. EquiHealth aims to:  
+Healthcare access is often unequal, with some districts having fewer facilities relative to population. EquiHealth aims to:  
 
-- **Collect** healthcare facility and population datasets from official/public sources  
+- **Collect** healthcare facility and population data for Maharashtra  
 - **Analyze and visualize** inequalities using interactive dashboards and maps  
 - **Enable reporting** of hospital shortages and service-related issues by citizens  
-- **Provide a resolution system** for government officials to review and act on complaints  
+- **Provide a system** for government officials to review and act on complaints  
 
 ---
 
-## 🚀 Planned Features  
+## 🚀 Features  
 
-- **Automated Data Collection (Scraping)** – Extract healthcare and population data from reliable online sources  
-- **Visualization Dashboards** – Interactive charts and maps to compare healthcare facilities vs. population demand  
-- **Complaint Portal** – Simple web interface where citizens can log issues such as shortages, lack of staff, or equipment failures  
-- **Government Forum** – Dedicated dashboard for authorities to track, discuss, and resolve reported issues  
+- **Visualization Dashboards** – Interactive charts and maps comparing hospital resources vs. population  
+- **Complaint Portal** – Citizens can log issues such as staff shortages, lack of equipment, or hospital service problems  
+- **Government Dashboard** – Authorities can track and resolve reported issues  
 
 ---
 
 ## 📊 Current Stage  
 
-🟢 **Planning and Design Phase**  
-- Repository created  
-- Requirements and architecture under discussion  
-- Development yet to begin  
+🟢 **Maharashtra Data Implemented**  
+- Home page shows hospital counts, bed counts, and beds per population  
+- Analytics pages include interactive charts and maps  
+- Complaint system functional with filtering and sorting  
+- Five main pages implemented: Home, File Complaint, Complaints, Analytics Map, Analytics Charts  
 
 ---
 
-## 🛠️ Planned Tech Stack (Tentative)  
+## 🛠️ Tech Stack  
 
-- **Frontend (UI):** React with Ant Design for UI components  
-- **Backend (APIs & Logic):** Python (Flask)  
-- **Database (Storage):** PostgreSQL  
-- **Data Analysis & Visualization:**  
-  - **Core Libraries:** Pandas, NumPy  
-  - **Visualization & Mapping:** Matplotlib, Seaborn
-  - **Frontend Charts:** Recharts for interactive charts and maps  
-- **Deployment (Hosting):** Docker containers, deployed primarily on AWS, with alternatives like Vercel, Render, or Netlify  
+- **Frontend:** React with Recharts for charts  
+- **Backend:** Python (Flask)  
+- **Database:** PostgreSQL  
+- **Data Analysis & Visualization:** Pandas, NumPy, Matplotlib, Seaborn  
+- **Deployment:** Docker, hosted on AWS / alternatives like Vercel or Render  
 
 ---
 
 ## 📅 Roadmap  
 
-- [ ] Finalize architecture & workflows  
-- [ ] Set up frontend and backend boilerplate code  
-- [ ] Build initial data scraping pipeline  
-- [ ] Create visualization dashboards (basic maps & charts)  
-- [ ] Develop complaint portal for citizens  
-- [ ] Implement government dashboard for issue resolution  
-- [ ] Deploy first MVP (Minimum Viable Product)  
+- [x] Maharashtra dataset fully integrated  
+- [x] Implement Home dashboard charts (hospital count, bed count, beds per population)  
+- [x] Implement Analytics pages (charts & maps)  
+- [x] Build complaint portal with filtering, search, and sorting  
+- [ ] Extend to other states in future  
 
 ---
 
 ## 🤝 Contributing  
 
-EquiHealth is at an **early development stage**. Suggestions, feedback, and contributions are welcome. Please open issues or pull requests if you’d like to contribute.  
+Suggestions and contributions are welcome. Open issues or pull requests for improvements or additional features.  
 
 ---
 
 ## 📜 License  
 
-This project is licensed under the **MIT License**. You are free to use, modify, and share the code with proper attribution.  
+MIT License – free to use, modify, and share with attribution.  
 
 ---
 
 ## ✨ Vision Statement  
 
-EquiHealth’s mission is to make healthcare systems more **transparent, data-driven, and accountable** by combining open data, citizen feedback, and government action—ensuring every citizen has fair access to essential healthcare facilities.  
+EquiHealth makes healthcare systems **transparent, data-driven, and accountable** in Maharashtra, combining open data, citizen feedback, and government action to ensure fair access to essential healthcare facilities.
